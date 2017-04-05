@@ -43,7 +43,7 @@ def construct_mapping(self, node, deep=False):
     Use OrderedDict for maps
     """
 
-    mapping = collections.OrderedDict()
+    mapping = dict()
 
     for key_node, value_node in node.value:
         key = self.construct_object(key_node, deep=deep)
@@ -73,20 +73,12 @@ class odict_items(list):
     def sort(self):
         pass
 
-class ODict(collections.OrderedDict):
-    def __init__(self, *args, **kwargs):
-        super(ODict, self).__init__(*args, **kwargs)
-
-        items = odict_items(self.items())
-        self.items = lambda: items
-
 def representer(dumper, data):
     """
     Deal with !Ref style function format and OrderedDict
     """
 
     if len(data.keys()) != 1:
-        data = ODict(data)
 
         return dumper.represent_mapping(TAG_MAP, data, flow_style=False)
 
@@ -114,5 +106,4 @@ def representer(dumper, data):
 yaml.add_representer(six.text_type, lambda dumper, value: dumper.represent_scalar(TAG_STRING, value))
 yaml.add_multi_constructor("!", multi_constructor)
 yaml.add_constructor(TAG_MAP, construct_mapping)
-yaml.add_representer(collections.OrderedDict, representer)
 yaml.add_representer(dict, representer)
